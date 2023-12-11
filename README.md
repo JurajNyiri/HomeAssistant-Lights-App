@@ -2,8 +2,10 @@
 
 Custom component that allows control of lights by [Lights App](https://play.google.com/store/apps/details?id=com.novolink.lightapp&hl=en_US)
 
-![Image of Product Box - Front](./img/img1.jpeg)
-![Image of Product Box - Side](./img/img2.jpeg)
+<p float="left">
+  <img src="/img/img2.jpeg" width="100" />
+  <img src="/img/img1.jpeg" width="100" /> 
+</p>
 
 ## Installation
 

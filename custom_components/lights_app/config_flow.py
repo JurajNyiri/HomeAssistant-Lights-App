@@ -1,11 +1,7 @@
 """Config flow for lights_app integration."""
-from __future__ import annotations
 import voluptuous as vol
-
-
-import logging
 from typing import Any
-from bleak import BleakScanner,BleakClient
+from bleak import BleakClient
 
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import (
@@ -16,44 +12,32 @@ from homeassistant.components import bluetooth
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResult
 
-from .const import WRITE_CHARACTERISTIC, DOMAIN, SERVICE, SUPPORTED_BLUETOOTH_NAMES, NOTIFY_CHARACTERISTIC
-
-_LOGGER = logging.getLogger(__name__)
+from .const import (
+    DOMAIN,
+    SERVICE,
+    SUPPORTED_BLUETOOTH_NAMES,
+)
+from .utils import getNotifyCharacteristic, getWriteCharacteristic
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    _LOGGER.warn("TEST123456")
-    """Handle a config flow for Yale Access Bluetooth."""
-
     VERSION = 1
 
     def __init__(self) -> None:
-        _LOGGER.warn("TEST123 - 1")
-        """Initialize the config flow."""
         self._discovery_info: BluetoothServiceInfoBleak | None = None
         self._discovered_devices: dict[str, BluetoothServiceInfoBleak] = {}
 
     async def async_step_bluetooth(
-        self, discovery_info: BluetoothServiceInfoBleak
+        self, discovery: BluetoothServiceInfoBleak
     ) -> FlowResult:
         """Handle the bluetooth discovery step."""
-        _LOGGER.warn("TEST123 - 2")
-        _LOGGER.warn(discovery_info.name)
-        """
-        if discovery_info.name.startswith(UNSUPPORTED_SUB_MODEL):
-            # These versions speak a different protocol
-            # that we do not support yet.
+        if discovery.name not in SUPPORTED_BLUETOOTH_NAMES:
             return self.async_abort(reason="not_supported")
-        await self.async_set_unique_id(discovery_info.address)
+        await self.async_set_unique_id(discovery.address)
         self._abort_if_unique_id_configured()
-        self._discovery_info = discovery_info
-        self.context["title_placeholders"] = {
-            "name": human_readable_name(
-                None, discovery_info.name, discovery_info.address
-            )
-        }
+        self._discovery_info = discovery
+        self.context["title_placeholders"] = {"name": discovery.address}
         return await self.async_step_user()
-        """
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -74,16 +58,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 discovery_info.address, raise_on_progress=False
             )
             self._abort_if_unique_id_configured()
-            ble_device = bluetooth.async_ble_device_from_address(self.hass, address, connectable=True)
+            ble_device = bluetooth.async_ble_device_from_address(
+                self.hass, address, connectable=True
+            )
 
             isValidDevice = False
             async with BleakClient(ble_device) as client:
                 communicationService = client.services.get_service(SERVICE)
                 if communicationService:
-                    writeCharacteristic = communicationService.get_characteristic(WRITE_CHARACTERISTIC)
-                    notifyCharacteristic = communicationService.get_characteristic(NOTIFY_CHARACTERISTIC)
-                    if writeCharacteristic and notifyCharacteristic:
-                        isValidDevice = True
+                    isValidDevice = getWriteCharacteristic(
+                        communicationService
+                    ) and getNotifyCharacteristic(communicationService)
             if isValidDevice:
                 return self.async_create_entry(
                     title=local_name,

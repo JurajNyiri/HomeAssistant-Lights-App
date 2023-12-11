@@ -1,5 +1,5 @@
-from bleak import BleakClient, BleakGATTServiceCollection
-from .const import WRITE_CHARACTERISTIC
+from bleak import BleakClient, BleakGATTServiceCollection, BleakGATTCharacteristic
+from .const import WRITE_CHARACTERISTIC, LOGGER, NOTIFY_CHARACTERISTIC
 
 
 def getTurnOnCommand():
@@ -15,7 +15,17 @@ def getWriteCharacteristic(service: BleakGATTServiceCollection):
     return writeCharacteristic
 
 
+def getNotifyCharacteristic(service: BleakGATTServiceCollection):
+    notifyCharacteristic = service.get_characteristic(NOTIFY_CHARACTERISTIC)
+    return notifyCharacteristic
+
+
 async def sendCommand(
     client: BleakClient, service: BleakGATTServiceCollection, command
 ):
     await client.write_gatt_char(getWriteCharacteristic(service), command, True)
+
+
+def notification_handler(characteristic: BleakGATTCharacteristic, data: bytearray):
+    LOGGER.warn("notification_handler")
+    LOGGER.warn(data)

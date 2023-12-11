@@ -10,8 +10,7 @@
         "description": "Select Device"
       }
     },
-    "error": {
-    },
+    "error": {},
     "abort": {
       "not_supported": "Device is not supported."
     }

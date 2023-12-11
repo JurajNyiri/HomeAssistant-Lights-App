@@ -1,0 +1,19 @@
+{
+  "title": "Lights App",
+  "config": {
+    "flow_title": "Lights App {name}",
+    "step": {
+      "user": {
+        "data": {
+          "address": "Device"
+        },
+        "description": "Select Device"
+      }
+    },
+    "error": {
+    },
+    "abort": {
+      "not_supported": "Device is not supported."
+    }
+  }
+}

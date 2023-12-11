@@ -1,4 +1,4 @@
-# HomeAssistant - Tapo: Cameras Control
+# HomeAssistant - Lights App
 
 ### Integration is currently work in progress and will barely work.
 

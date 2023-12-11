@@ -5,8 +5,8 @@
 Custom component that allows control of lights by [Lights App](https://play.google.com/store/apps/details?id=com.novolink.lightapp&hl=en_US)
 
 <p float="left">
-  <img src="/img/img2.jpeg" width="100" />
-  <img src="/img/img1.jpeg" width="100" /> 
+  <img src="/img/img2.jpeg" width="200" />
+  <img src="/img/img1.jpeg" width="200" /> 
 </p>
 
 ## Installation

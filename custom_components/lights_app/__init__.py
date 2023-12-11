@@ -77,7 +77,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             await client.write_gatt_char(writeCharacteristic, command, True)
             
             hass.async_create_task(
-                hass.config_entries.async_forward_entry_setup(entry, "switch")
+                hass.config_entries.async_forward_entry_setup(entry, "light")
             )
         return True
     raise ConfigEntryNotReady()

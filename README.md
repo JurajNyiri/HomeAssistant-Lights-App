@@ -1,5 +1,7 @@
 # HomeAssistant - Tapo: Cameras Control
 
+### Integration is currently work in progress and will barely work.
+
 Custom component that allows control of lights by [Lights App](https://play.google.com/store/apps/details?id=com.novolink.lightapp&hl=en_US)
 
 <p float="left">

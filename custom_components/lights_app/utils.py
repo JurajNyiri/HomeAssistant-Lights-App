@@ -35,10 +35,9 @@ def getModeCommand(mode):
 
 
 def getBrightnessCommand(brightness):
-    if brightness < 100 and brightness >= 10:
-        return bytearray.fromhex(
-            ("03 01 01 " + str(int(hex(brightness), 16))).replace(" ", "")
-        )
+    if 10 <= brightness < 100:
+        hex_string = f"03 01 01 {brightness:02x}"
+        return bytearray.fromhex(hex_string.replace(" ", ""))
     raise Exception(
         "Invalid brightness. Brightness has to be larger than 10 and smaller than 100."
     )
@@ -50,7 +49,9 @@ def get_brightness_from_bytearray(byte_array):
     brightness_value = byte_array[3]
     # Convert the decimal brightness value to hexadecimal and remove the '0x' prefix
     brightness_hex = hex(brightness_value)[2:]
-    return brightness_hex
+    # Convert the hexadecimal value back to decimal
+    brightness_decimal = int(brightness_hex, 16)
+    return brightness_decimal
 
 
 async def sendCommand(
@@ -121,6 +122,9 @@ def notification_handler(entryData: dict):
         if b"\x00\x00\x00\x00\x00\x00\x00\x00" in data and len(data) == 18:
             entryData["mode"] = transformModeFromHex(data[-1])
             entryData["brightness"] = get_brightness_from_bytearray(data)
+            LOGGER.warn(
+                "State of brightness changed to: " + str(entryData["brightness"])
+            )
             entryData["modePending"] = False
             entryData["brightnessPending"] = False
             await updateEntities(entryData["entities"])

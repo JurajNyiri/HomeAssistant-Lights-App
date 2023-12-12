@@ -13,6 +13,7 @@ from .utils import (
     sendCommand,
     getLightStateCommand,
     disconnect_handler,
+    getModeStateCommand,
 )
 
 
@@ -66,6 +67,11 @@ async def setupConnection(hass, address, config_entry):
                         communicationService,
                         getLightStateCommand(),
                     )
+                    await sendCommand(
+                        client,
+                        communicationService,
+                        getModeStateCommand(),
+                    )
 
                 LOGGER.warn("Connection completed.")
             else:
@@ -90,6 +96,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             "entities": [],
             "state": None,
             "statePending": True,
+            "mode": None,
+            "modePending": True,
             "connection": {"connected": False, "connecting": False},
         }
 
@@ -111,6 +119,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, "light")
+        )
+        hass.async_create_task(
+            hass.config_entries.async_forward_entry_setup(entry, "switch")
         )
 
         return True

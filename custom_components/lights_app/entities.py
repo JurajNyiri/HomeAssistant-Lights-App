@@ -2,6 +2,7 @@ from homeassistant.util import slugify
 from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.const import CONF_ADDRESS, STATE_UNAVAILABLE
 from homeassistant.components.light import LightEntity
+from homeassistant.components.switch import SwitchEntity
 from .const import DOMAIN
 
 
@@ -43,3 +44,9 @@ class LightsAppLightEntity(LightEntity, LightsAppEntity):
     def __init__(self, hass, config_entry: dict, entryData: dict, name_suffix: str):
         LightsAppEntity.__init__(self, hass, config_entry, entryData, name_suffix)
         LightEntity.__init__(self)
+
+
+class LightsAppSwitchEntity(SwitchEntity, LightsAppEntity):
+    def __init__(self, hass, config_entry: dict, entryData: dict, name_suffix: str):
+        LightsAppEntity.__init__(self, hass, config_entry, entryData, name_suffix)
+        SwitchEntity.__init__(self)

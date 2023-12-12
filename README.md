@@ -24,3 +24,11 @@ Integration allows setting brightness, controlling state and all the available m
 <p float="left">
   <img src="/img/img3.png" width="400" />
 </p>
+
+## Have a comment or a suggestion?
+
+Please [open a new issue](https://github.com/JurajNyiri/HomeAssistant-Lights-App/issues/new/choose), or discuss on [Home Assistant: Community Forum](https://community.home-assistant.io/t/custom-component-tapo-cameras-control/231795).
+
+## Thank you
+
+<a href="https://www.buymeacoffee.com/jurajnyiri" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee"  width="150px" ></a>

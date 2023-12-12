@@ -1,5 +1,6 @@
 from bleak import BleakClient, BleakGATTServiceCollection, BleakGATTCharacteristic
 from .const import WRITE_CHARACTERISTIC, LOGGER, NOTIFY_CHARACTERISTIC
+from bleak_retry_connector import BleakClientWithServiceCache
 
 
 def getTurnOnCommand():
@@ -35,6 +36,17 @@ async def updateEntities(entities):
         LOGGER.warn(entity)
         entity.async_write_ha_state()
         await entity.async_update()
+
+
+def disconnect_handler(entryData: dict):
+    def handleBleakDisconnect(client: BleakClientWithServiceCache) -> None:
+        LOGGER.warn("handleBleakDisconnect")
+        entryData["state"] = None
+        entryData["statePending"] = False
+        for entity in entryData["entities"]:
+            entity.async_write_ha_state()
+
+    return handleBleakDisconnect
 
 
 def notification_handler(entryData: dict):

@@ -5,13 +5,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.components import bluetooth
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN, SERVICE
+from .const import DOMAIN, SERVICE, LOGGER
 from .utils import (
     notification_handler,
     getNotifyCharacteristic,
     sendCommand,
     getLightStateCommand,
+    disconnect_handler,
 )
+
+from led_ble import LEDBLE
+
+from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -25,15 +30,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     if ble_device:
         hass.data[DOMAIN][entry.entry_id] = {
+            "address": address,
             "entities": [],
             "state": None,
             "statePending": True,
+            "connection": {},
         }
-        hass.data[DOMAIN][entry.entry_id]["connection"] = {
-            "client": BleakClient(ble_device),
-        }
+
+        # todo what happens if connection fails?
+        hass.data[DOMAIN][entry.entry_id]["connection"][
+            "client"
+        ] = await establish_connection(
+            BleakClientWithServiceCache,
+            ble_device,
+            address,
+            disconnect_handler(hass.data[DOMAIN][entry.entry_id]),
+            use_services_cache=True,
+        )
+        hass.data[DOMAIN][entry.entry_id]["connection"]["connected"] = True
+        # todo add refresh that detects whether we are connected or not
+
         client = hass.data[DOMAIN][entry.entry_id]["connection"]["client"]
-        await client.connect()
         hass.data[DOMAIN][entry.entry_id]["connection"][
             "service"
         ] = client.services.get_service(SERVICE)

@@ -83,25 +83,26 @@ async def setupConnection(hass, address, config_entry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the Lights App component from a config entry."""
+    LOGGER.debug("async_setup_entry")
     hass.data.setdefault(DOMAIN, {})
 
     address = entry.data.get(CONF_ADDRESS)
 
-    ble_device = bluetooth.async_ble_device_from_address(
-        hass, address, connectable=True
-    )
-    if ble_device:
-        hass.data[DOMAIN][entry.entry_id] = {
-            "address": address,
-            "entities": [],
-            "state": None,
-            "statePending": True,
-            "mode": None,
-            "modePending": True,
-            "brightness": None,
-            "brightnessPending": True,
-            "connection": {"connected": False, "connecting": False},
-        }
+    hass.data[DOMAIN][entry.entry_id] = {
+        "address": address,
+        "entities": [],
+        "state": None,
+        "statePending": True,
+        "mode": None,
+        "modePending": True,
+        "brightness": None,
+        "brightnessPending": True,
+        "connection": {"connected": False, "connecting": False},
+    }
+
+    await setupConnection(hass, address, entry)
+
+    if hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
 
         async def async_update_data():
             LOGGER.debug("async_update_data - entry")
@@ -117,8 +118,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
         hass.data[DOMAIN][entry.entry_id]["coordinator"] = lightsAppCoordinator
 
-        await setupConnection(hass, address, entry)
-
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, "light")
         )
@@ -128,6 +127,5 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, "number")
         )
-
         return True
     raise ConfigEntryNotReady()

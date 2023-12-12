@@ -81,6 +81,17 @@ async def setupConnection(hass, address, config_entry):
         hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = False
 
 
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    await hass.config_entries.async_forward_entry_unload(entry, "switch")
+    await hass.config_entries.async_forward_entry_unload(entry, "light")
+    await hass.config_entries.async_forward_entry_unload(entry, "number")
+    if hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
+        client = hass.data[DOMAIN][entry.entry_id]["connection"]["client"]
+        await client.disconnect()
+
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the Lights App component from a config entry."""
     LOGGER.debug("async_setup_entry")

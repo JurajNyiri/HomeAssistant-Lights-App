@@ -119,6 +119,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         async def async_update_data():
             LOGGER.debug("async_update_data - entry")
+            await sendCommand(
+                hass.data[DOMAIN][entry.entry_id],
+                hass.data[DOMAIN][entry.entry_id]["connection"]["client"],
+                hass.data[DOMAIN][entry.entry_id]["connection"]["service"],
+                getLightStateCommand(),
+            )
+            await sendCommand(
+                hass.data[DOMAIN][entry.entry_id],
+                hass.data[DOMAIN][entry.entry_id]["connection"]["client"],
+                hass.data[DOMAIN][entry.entry_id]["connection"]["service"],
+                getModeStateCommand(),
+            )
             if not hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
                 LOGGER.debug("Not connected, reconnecting...")
                 await setupConnection(hass, address, entry)

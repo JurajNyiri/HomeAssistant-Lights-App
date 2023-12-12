@@ -1,9 +1,10 @@
-from bleak import BleakClient
+from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.core import HomeAssistant
 from homeassistant.components import bluetooth
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, SERVICE, LOGGER
 from .utils import (
@@ -13,10 +14,6 @@ from .utils import (
     getLightStateCommand,
     disconnect_handler,
 )
-
-from led_ble import LEDBLE
-
-from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -36,6 +33,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             "statePending": True,
             "connection": {},
         }
+
+        async def async_update_data():
+            LOGGER.warn("async_update_data - entry")
+
+        lightsAppCoordinator = DataUpdateCoordinator(
+            hass,
+            LOGGER,
+            name="Lights App resource status",
+            update_method=async_update_data,
+        )
+        hass.data[DOMAIN][entry.entry_id]["coordinator"] = lightsAppCoordinator
 
         # todo what happens if connection fails?
         hass.data[DOMAIN][entry.entry_id]["connection"][

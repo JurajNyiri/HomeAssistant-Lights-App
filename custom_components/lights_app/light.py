@@ -40,9 +40,9 @@ class LightsAppTurnOnOff(LightsAppLightEntity):
                 self._attr_state = "on" if self._entryData["state"] else "off"
 
     async def async_update(self) -> None:
-        LOGGER.warn("async_update")
         if not self._entryData["statePending"]:
             self.setState()
+        await self._entryData["coordinator"].async_request_refresh()
 
     async def async_turn_on(self) -> None:
         await sendCommand(self._client, self._service, getTurnOnCommand())

@@ -17,52 +17,61 @@ from .utils import (
 
 
 async def setupConnection(hass, address, config_entry):
+    LOGGER.warn("setupConnection")
     if not hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"]:
-        hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = True
-        ble_device = bluetooth.async_ble_device_from_address(
-            hass, address, connectable=True
-        )
-        if ble_device:
-            LOGGER.warn("BLE Device found, connecting...")
-            hass.data[DOMAIN][config_entry.entry_id]["connection"][
-                "client"
-            ] = await establish_connection(
-                BleakClientWithServiceCache,
-                ble_device,
-                name=address,
-                disconnected_callback=disconnect_handler(
-                    hass.data[DOMAIN][config_entry.entry_id]
-                ),
-                use_services_cache=True,
-                max_attempts=1,
+        LOGGER.warn("Initiating connection attempt...")
+        try:
+            hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = True
+            ble_device = bluetooth.async_ble_device_from_address(
+                hass, address, connectable=True
             )
-            hass.data[DOMAIN][config_entry.entry_id]["connection"]["connected"] = True
-            LOGGER.warn(
-                "Connected successfully, setting up subscribers and getting data..."
-            )
-            client = hass.data[DOMAIN][config_entry.entry_id]["connection"]["client"]
-            hass.data[DOMAIN][config_entry.entry_id]["connection"][
-                "service"
-            ] = client.services.get_service(SERVICE)
-            communicationService = hass.data[DOMAIN][config_entry.entry_id][
-                "connection"
-            ]["service"]
-
-            if communicationService:
-                await client.start_notify(
-                    getNotifyCharacteristic(communicationService),
-                    notification_handler(hass.data[DOMAIN][config_entry.entry_id]),
+            if ble_device:
+                LOGGER.warn("BLE Device found, connecting...")
+                hass.data[DOMAIN][config_entry.entry_id]["connection"][
+                    "client"
+                ] = await establish_connection(
+                    BleakClientWithServiceCache,
+                    ble_device,
+                    name=address,
+                    disconnected_callback=disconnect_handler(
+                        hass.data[DOMAIN][config_entry.entry_id]
+                    ),
+                    use_services_cache=True,
+                    max_attempts=1,
                 )
-
-                await sendCommand(
-                    client,
-                    communicationService,
-                    getLightStateCommand(),
+                hass.data[DOMAIN][config_entry.entry_id]["connection"][
+                    "connected"
+                ] = True
+                LOGGER.warn(
+                    "Connected successfully, setting up subscribers and getting data..."
                 )
+                client = hass.data[DOMAIN][config_entry.entry_id]["connection"][
+                    "client"
+                ]
+                hass.data[DOMAIN][config_entry.entry_id]["connection"][
+                    "service"
+                ] = client.services.get_service(SERVICE)
+                communicationService = hass.data[DOMAIN][config_entry.entry_id][
+                    "connection"
+                ]["service"]
 
-            LOGGER.warn("Connection completed.")
-        else:
-            LOGGER.warn("BLE Device not found.")
+                if communicationService:
+                    await client.start_notify(
+                        getNotifyCharacteristic(communicationService),
+                        notification_handler(hass.data[DOMAIN][config_entry.entry_id]),
+                    )
+
+                    await sendCommand(
+                        client,
+                        communicationService,
+                        getLightStateCommand(),
+                    )
+
+                LOGGER.warn("Connection completed.")
+            else:
+                LOGGER.warn("BLE Device not found.")
+        except Exception as err:
+            LOGGER.error(err)
         hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = False
 
 

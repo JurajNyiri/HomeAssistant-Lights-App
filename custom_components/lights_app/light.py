@@ -19,7 +19,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    LOGGER.warn("Setting up lights")
+    LOGGER.debug("Setting up lights")
     on_off = LightsAppTurnOnOff(
         hass, config_entry, hass.data[DOMAIN][config_entry.entry_id]
     )

@@ -18,16 +18,16 @@ from .utils import (
 
 
 async def setupConnection(hass, address, config_entry):
-    LOGGER.warn("setupConnection")
+    LOGGER.debug("setupConnection")
     if not hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"]:
-        LOGGER.warn("Initiating connection attempt...")
+        LOGGER.debug("Initiating connection attempt...")
         try:
             hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = True
             ble_device = bluetooth.async_ble_device_from_address(
                 hass, address, connectable=True
             )
             if ble_device:
-                LOGGER.warn("BLE Device found, connecting...")
+                LOGGER.debug("BLE Device found, connecting...")
                 hass.data[DOMAIN][config_entry.entry_id]["connection"][
                     "client"
                 ] = await establish_connection(
@@ -43,7 +43,7 @@ async def setupConnection(hass, address, config_entry):
                 hass.data[DOMAIN][config_entry.entry_id]["connection"][
                     "connected"
                 ] = True
-                LOGGER.warn(
+                LOGGER.debug(
                     "Connected successfully, setting up subscribers and getting data..."
                 )
                 client = hass.data[DOMAIN][config_entry.entry_id]["connection"][
@@ -73,9 +73,9 @@ async def setupConnection(hass, address, config_entry):
                         getModeStateCommand(),
                     )
 
-                LOGGER.warn("Connection completed.")
+                LOGGER.debug("Connection completed.")
             else:
-                LOGGER.warn("BLE Device not found.")
+                LOGGER.debug("BLE Device not found.")
         except Exception as err:
             LOGGER.error(err)
         hass.data[DOMAIN][config_entry.entry_id]["connection"]["connecting"] = False
@@ -104,9 +104,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         }
 
         async def async_update_data():
-            LOGGER.warn("async_update_data - entry")
+            LOGGER.debug("async_update_data - entry")
             if not hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
-                LOGGER.warn("Not connected, reconnecting...")
+                LOGGER.debug("Not connected, reconnecting...")
                 await setupConnection(hass, address, entry)
 
         lightsAppCoordinator = DataUpdateCoordinator(

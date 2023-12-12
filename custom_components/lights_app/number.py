@@ -18,7 +18,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    LOGGER.warn("Setting up lights")
+    LOGGER.debug("Setting up number")
     lightsAppBrightness = LightsAppBrightness(
         hass, config_entry, hass.data[DOMAIN][config_entry.entry_id]
     )
@@ -49,9 +49,9 @@ class LightsAppBrightness(LightsAppNumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         command = getBrightnessCommand(int(value))
-        LOGGER.warn("Setting to:")
-        LOGGER.warn(int(value))
-        LOGGER.warn(command)
+        LOGGER.debug("Setting to:")
+        LOGGER.debug(int(value))
+        LOGGER.debug(command)
         await sendCommand(self._client, self._service, getBrightnessCommand(int(value)))
 
     @property

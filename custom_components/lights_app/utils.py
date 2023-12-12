@@ -68,7 +68,7 @@ async def updateEntities(entities):
 
 def disconnect_handler(entryData: dict):
     def handleBleakDisconnect(client: BleakClientWithServiceCache) -> None:
-        LOGGER.warn("handleBleakDisconnect")
+        LOGGER.debug("handleBleakDisconnect")
         entryData["state"] = None
         entryData["statePending"] = False
         entryData["connection"]["connected"] = False
@@ -82,7 +82,6 @@ def transformModeFromHex(hexByte):
     binary_representation = bin(hexByte)[2:][-7:].zfill(7)
     if binary_representation == "0000000":
         binary_representation = "1111111"
-    LOGGER.warn(binary_representation)
     bits_array = [int(bit) for bit in binary_representation]
     return {
         "stay_on": bits_array[0] == 1,
@@ -109,8 +108,8 @@ def notification_handler(entryData: dict):
     async def bleak_notification_handler(
         characteristic: BleakGATTCharacteristic, data: bytearray
     ):
-        LOGGER.warn("notification_handler")
-        LOGGER.warn(data)
+        LOGGER.debug("notification_handler")
+        LOGGER.debug(data)
         # process state
         if b"\x00\x00\x02" in data and len(data) == 5:
             state = data[3] == 0x01
@@ -122,7 +121,7 @@ def notification_handler(entryData: dict):
         if b"\x00\x00\x00\x00\x00\x00\x00\x00" in data and len(data) == 18:
             entryData["mode"] = transformModeFromHex(data[-1])
             entryData["brightness"] = get_brightness_from_bytearray(data)
-            LOGGER.warn(
+            LOGGER.debug(
                 "State of brightness changed to: " + str(entryData["brightness"])
             )
             entryData["modePending"] = False

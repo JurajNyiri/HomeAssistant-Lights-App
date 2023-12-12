@@ -1,7 +1,5 @@
 # HomeAssistant - Lights App
 
-### Integration is currently work in progress and will barely work.
-
 Custom component that allows control of lights by [Lights App](https://play.google.com/store/apps/details?id=com.novolink.lightapp&hl=en_US)
 
 <p float="left">
@@ -18,3 +16,11 @@ Copy contents of custom_components/lights_app/ to custom_components/lights_app/ 
 Add this repository as custom repository.
 
 HACS is a community store for Home Assistant. You can install [HACS](https://github.com/custom-components/hacs) and then install Lights App from the HACS store.
+
+## Usage
+
+Integration allows setting brightness, controlling state and all the available modes.
+
+<p float="left">
+  <img src="/img/img3.png" width="400" />
+</p>

@@ -18,7 +18,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    LOGGER.warn("Setting up switches")
+    LOGGER.debug("Setting up switches")
     modeSwitches = [
         LightsAppModeSwitch(
             hass,

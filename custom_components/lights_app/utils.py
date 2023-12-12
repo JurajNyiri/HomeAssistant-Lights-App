@@ -43,6 +43,7 @@ def disconnect_handler(entryData: dict):
         LOGGER.warn("handleBleakDisconnect")
         entryData["state"] = None
         entryData["statePending"] = False
+        entryData["connection"]["connected"] = False
         for entity in entryData["entities"]:
             entity.async_write_ha_state()
 

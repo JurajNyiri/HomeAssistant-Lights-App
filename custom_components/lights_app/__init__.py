@@ -36,6 +36,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         async def async_update_data():
             LOGGER.warn("async_update_data - entry")
+            if not hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
+                LOGGER.warn("RECONNECT REQUIRED!")
 
         lightsAppCoordinator = DataUpdateCoordinator(
             hass,

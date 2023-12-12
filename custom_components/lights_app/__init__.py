@@ -37,7 +37,50 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         async def async_update_data():
             LOGGER.warn("async_update_data - entry")
             if not hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
-                LOGGER.warn("RECONNECT REQUIRED!")
+                LOGGER.warn("Not connected, reconnecting...")
+                ble_device = bluetooth.async_ble_device_from_address(
+                    hass, address, connectable=True
+                )
+                if ble_device:
+                    LOGGER.warn("BLE Device found, connecting...")
+                    hass.data[DOMAIN][entry.entry_id]["connection"][
+                        "client"
+                    ] = await establish_connection(
+                        BleakClientWithServiceCache,
+                        ble_device,
+                        name=address,
+                        disconnected_callback=disconnect_handler(
+                            hass.data[DOMAIN][entry.entry_id]
+                        ),
+                        use_services_cache=True,
+                        max_attempts=1,
+                    )
+                    LOGGER.warn(
+                        "Reconnected successfully, setting up subscribers and getting data..."
+                    )
+                    client = hass.data[DOMAIN][entry.entry_id]["connection"]["client"]
+                    hass.data[DOMAIN][entry.entry_id]["connection"][
+                        "service"
+                    ] = client.services.get_service(SERVICE)
+                    communicationService = hass.data[DOMAIN][entry.entry_id][
+                        "connection"
+                    ]["service"]
+
+                    if communicationService:
+                        await client.start_notify(
+                            getNotifyCharacteristic(communicationService),
+                            notification_handler(hass.data[DOMAIN][entry.entry_id]),
+                        )
+
+                        await sendCommand(
+                            client,
+                            communicationService,
+                            getLightStateCommand(),
+                        )
+
+                    LOGGER.warn("Reconnect completed.")
+                else:
+                    LOGGER.warn("BLE Device not found.")
 
         lightsAppCoordinator = DataUpdateCoordinator(
             hass,

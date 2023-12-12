@@ -34,6 +34,25 @@ def getModeCommand(mode):
     return bytearray.fromhex(("05 01 02 03 " + hex_string).replace(" ", ""))
 
 
+def getBrightnessCommand(brightness):
+    if brightness < 100 and brightness >= 10:
+        return bytearray.fromhex(
+            ("03 01 01 " + str(int(hex(brightness), 16))).replace(" ", "")
+        )
+    raise Exception(
+        "Invalid brightness. Brightness has to be larger than 10 and smaller than 100."
+    )
+
+
+def get_brightness_from_bytearray(byte_array):
+    # Assuming brightness value is always at the 4th index (0-based).
+    # Since the bytearray represents the brightness in a single byte, we treat it as a number already in decimal.
+    brightness_value = byte_array[3]
+    # Convert the decimal brightness value to hexadecimal and remove the '0x' prefix
+    brightness_hex = hex(brightness_value)[2:]
+    return brightness_hex
+
+
 async def sendCommand(
     client: BleakClient, service: BleakGATTServiceCollection, command
 ):
@@ -98,15 +117,12 @@ def notification_handler(entryData: dict):
             entryData["statePending"] = False
             await updateEntities(entryData["entities"])
 
-        # process mode
-        if (
-            b"\x02\x00\x0fc\x12\x00\x17;\x00\x00\x00\x00\x00\x00\x00\x00" in data
-            and len(data) == 18
-        ):
-            LOGGER.warn("process mode")
+        # process mode and brightness data
+        if b"\x00\x00\x00\x00\x00\x00\x00\x00" in data and len(data) == 18:
             entryData["mode"] = transformModeFromHex(data[-1])
-            LOGGER.warn(entryData["mode"])
+            entryData["brightness"] = get_brightness_from_bytearray(data)
             entryData["modePending"] = False
+            entryData["brightnessPending"] = False
             await updateEntities(entryData["entities"])
 
     return bleak_notification_handler

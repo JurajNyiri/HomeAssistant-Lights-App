@@ -98,6 +98,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             "statePending": True,
             "mode": None,
             "modePending": True,
+            "brightness": None,
+            "brightnessPending": True,
             "connection": {"connected": False, "connecting": False},
         }
 

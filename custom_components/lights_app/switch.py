@@ -94,13 +94,19 @@ class LightsAppModeSwitch(LightsAppSwitchEntity):
     async def async_turn_on(self) -> None:
         self._entryData["mode"][self._mode] = True
         await sendCommand(
-            self._client, self._service, getModeCommand(self._entryData["mode"])
+            self._entryData,
+            self._client,
+            self._service,
+            getModeCommand(self._entryData["mode"]),
         )
 
     async def async_turn_off(self) -> None:
         self._entryData["mode"][self._mode] = False
         await sendCommand(
-            self._client, self._service, getModeCommand(self._entryData["mode"])
+            self._entryData,
+            self._client,
+            self._service,
+            getModeCommand(self._entryData["mode"]),
         )
 
     @property

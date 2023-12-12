@@ -45,10 +45,14 @@ class LightsAppTurnOnOff(LightsAppLightEntity):
         await self._entryData["coordinator"].async_request_refresh()
 
     async def async_turn_on(self) -> None:
-        await sendCommand(self._client, self._service, getTurnOnCommand())
+        await sendCommand(
+            self._entryData, self._client, self._service, getTurnOnCommand()
+        )
 
     async def async_turn_off(self) -> None:
-        await sendCommand(self._client, self._service, getTurnOffCommand())
+        await sendCommand(
+            self._entryData, self._client, self._service, getTurnOffCommand()
+        )
 
     @property
     def state(self):

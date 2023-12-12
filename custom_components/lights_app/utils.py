@@ -55,9 +55,14 @@ def get_brightness_from_bytearray(byte_array):
 
 
 async def sendCommand(
-    client: BleakClient, service: BleakGATTServiceCollection, command
+    entryData: dict, client: BleakClient, service: BleakGATTServiceCollection, command
 ):
-    await client.write_gatt_char(getWriteCharacteristic(service), command, True)
+    try:
+        await client.write_gatt_char(getWriteCharacteristic(service), command, True)
+    except Exception as err:
+        LOGGER.error(err)
+        LOGGER.debug("Detected error on write, calling disconnect handler!")
+        disconnect_handler(entryData)(client)
 
 
 async def updateEntities(entities):

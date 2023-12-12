@@ -63,11 +63,13 @@ async def setupConnection(hass, address, config_entry):
                     )
 
                     await sendCommand(
+                        hass.data[DOMAIN][config_entry.entry_id],
                         client,
                         communicationService,
                         getLightStateCommand(),
                     )
                     await sendCommand(
+                        hass.data[DOMAIN][config_entry.entry_id],
                         client,
                         communicationService,
                         getModeStateCommand(),

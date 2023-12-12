@@ -52,7 +52,12 @@ class LightsAppBrightness(LightsAppNumberEntity):
         LOGGER.debug("Setting to:")
         LOGGER.debug(int(value))
         LOGGER.debug(command)
-        await sendCommand(self._client, self._service, getBrightnessCommand(int(value)))
+        await sendCommand(
+            self._entryData,
+            self._client,
+            self._service,
+            getBrightnessCommand(int(value)),
+        )
 
     @property
     def state(self):

@@ -1,19 +1,20 @@
 from homeassistant.util import slugify
 from homeassistant.helpers.entity import DeviceInfo, Entity
-from homeassistant.const import CONF_ADDRESS
+from homeassistant.const import CONF_ADDRESS, STATE_UNAVAILABLE
 from homeassistant.components.light import LightEntity
 from .const import DOMAIN
 
 
 class LightsAppEntity(Entity):
-    def __init__(self, hass, config_entry: dict, name_suffix: str):
+    def __init__(self, hass, config_entry: dict, entryData: dict, name_suffix: str):
         self._hass = hass
         self._address = config_entry.data.get(CONF_ADDRESS)
         self._client = hass.data[DOMAIN][config_entry.entry_id]["connection"]["client"]
         self._service = hass.data[DOMAIN][config_entry.entry_id]["connection"][
             "service"
         ]
-        self._entry = config_entry
+        self._entryData = entryData
+        self._config_entry = config_entry
         self._enabled = False
         self._name = "Lights App"
         self._name_suffix = name_suffix
@@ -39,7 +40,6 @@ class LightsAppEntity(Entity):
 
 
 class LightsAppLightEntity(LightEntity, LightsAppEntity):
-    def __init__(self, hass, config_entry: dict, name_suffix: str):
-        self._attr_is_on = False
-        LightsAppEntity.__init__(self, hass, config_entry, name_suffix)
+    def __init__(self, hass, config_entry: dict, entryData: dict, name_suffix: str):
+        LightsAppEntity.__init__(self, hass, config_entry, entryData, name_suffix)
         LightEntity.__init__(self)

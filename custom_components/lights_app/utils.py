@@ -30,6 +30,23 @@ async def sendCommand(
     await client.write_gatt_char(getWriteCharacteristic(service), command, True)
 
 
-def notification_handler(characteristic: BleakGATTCharacteristic, data: bytearray):
-    LOGGER.warn("notification_handler")
-    LOGGER.warn(data)
+async def updateEntities(entities):
+    for entity in entities:
+        LOGGER.warn(entity)
+        entity.async_write_ha_state()
+        await entity.async_update()
+
+
+def notification_handler(entryData: dict):
+    async def bleak_notification_handler(
+        characteristic: BleakGATTCharacteristic, data: bytearray
+    ):
+        LOGGER.warn("notification_handler")
+        LOGGER.warn(data)
+        if b"\x00\x00\x02" in data and len(data) == 5:
+            state = data[3] == 0x01
+            entryData["state"] = state
+            entryData["statePending"] = False
+            await updateEntities(entryData["entities"])
+
+    return bleak_notification_handler

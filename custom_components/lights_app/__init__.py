@@ -24,9 +24,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass, address, connectable=True
     )
     if ble_device:
-        hass.data[DOMAIN][entry.entry_id] = {}
+        hass.data[DOMAIN][entry.entry_id] = {
+            "entities": [],
+            "state": None,
+            "statePending": True,
+        }
         hass.data[DOMAIN][entry.entry_id]["connection"] = {
-            "client": BleakClient(ble_device)
+            "client": BleakClient(ble_device),
         }
         client = hass.data[DOMAIN][entry.entry_id]["connection"]["client"]
         await client.connect()
@@ -38,7 +42,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         ]
         if communicationService:
             await client.start_notify(
-                getNotifyCharacteristic(communicationService), notification_handler
+                getNotifyCharacteristic(communicationService),
+                notification_handler(hass.data[DOMAIN][entry.entry_id]),
             )
 
             await sendCommand(

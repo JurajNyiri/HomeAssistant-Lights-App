@@ -6,7 +6,12 @@ from homeassistant.components import bluetooth
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, SERVICE
-from .utils import notification_handler, getNotifyCharacteristic
+from .utils import (
+    notification_handler,
+    getNotifyCharacteristic,
+    sendCommand,
+    getLightStateCommand,
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -34,6 +39,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if communicationService:
             await client.start_notify(
                 getNotifyCharacteristic(communicationService), notification_handler
+            )
+
+            await sendCommand(
+                client,
+                communicationService,
+                getLightStateCommand(),
             )
 
             hass.async_create_task(

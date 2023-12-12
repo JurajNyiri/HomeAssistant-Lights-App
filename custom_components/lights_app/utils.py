@@ -20,6 +20,10 @@ def getNotifyCharacteristic(service: BleakGATTServiceCollection):
     return notifyCharacteristic
 
 
+def getLightStateCommand():
+    return bytearray.fromhex("00 00 03 11 26 11".replace(" ", ""))
+
+
 async def sendCommand(
     client: BleakClient, service: BleakGATTServiceCollection, command
 ):

@@ -17,6 +17,10 @@ Add this repository as custom repository.
 
 HACS is a community store for Home Assistant. You can install [HACS](https://github.com/custom-components/hacs) and then install Lights App from the HACS store.
 
+## Supported devices
+
+Currently the 48m and the 5.5m variant are supported. If your device does not show up, check the available Bluetooth devices on your phone and add the name to the `SUPPORTED_BLUETOOTH_NAMES` in the `const.py`.
+
 ## Usage
 
 Integration allows setting brightness, controlling state and all the available modes.

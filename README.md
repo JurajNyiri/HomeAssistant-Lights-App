@@ -1,3 +1,4 @@
+
 # HomeAssistant - Lights App
 
 Custom component that allows control of lights by [Lights App](https://play.google.com/store/apps/details?id=com.novolink.lightapp&hl=en_US)
@@ -31,7 +32,7 @@ Integration allows setting brightness, controlling state and all the available m
 
 ## Have a comment or a suggestion?
 
-Please [open a new issue](https://github.com/JurajNyiri/HomeAssistant-Lights-App/issues/new/choose), or discuss on [Home Assistant: Community Forum](https://community.home-assistant.io/t/custom-component-tapo-cameras-control/231795).
+Please [open a new issue](https://github.com/JurajNyiri/HomeAssistant-Lights-App/issues/new/choose), or discuss on [Home Assistant: Community Forum](https://community.home-assistant.io/t/custom-component-lights-app-bluetooth-outside-christmas-lights/654770).
 
 ## Thank you
 

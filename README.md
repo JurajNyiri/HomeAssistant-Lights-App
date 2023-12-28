@@ -19,7 +19,7 @@ HACS is a community store for Home Assistant. You can install [HACS](https://git
 
 ## Supported devices
 
-Currently the 48m and the 5.5m variant are supported. If your device does not show up, check the available Bluetooth devices on your phone and add the name to the `SUPPORTED_BLUETOOTH_NAMES` in the `const.py`.
+Currently the 48m and the 5.5m variant are supported. If your device does not show up, check the available Bluetooth devices on your phone and add the name to the `SUPPORTED_BLUETOOTH_NAMES` in the `const.py` and please open PR.
 
 ## Usage
 

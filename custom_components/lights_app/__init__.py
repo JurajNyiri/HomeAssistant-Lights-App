@@ -28,17 +28,17 @@ async def setupConnection(hass, address, config_entry):
             )
             if ble_device:
                 LOGGER.debug("BLE Device found, connecting...")
-                hass.data[DOMAIN][config_entry.entry_id]["connection"][
-                    "client"
-                ] = await establish_connection(
-                    BleakClientWithServiceCache,
-                    ble_device,
-                    name=address,
-                    disconnected_callback=disconnect_handler(
-                        hass.data[DOMAIN][config_entry.entry_id]
-                    ),
-                    use_services_cache=True,
-                    max_attempts=1,
+                hass.data[DOMAIN][config_entry.entry_id]["connection"]["client"] = (
+                    await establish_connection(
+                        BleakClientWithServiceCache,
+                        ble_device,
+                        name=address,
+                        disconnected_callback=disconnect_handler(
+                            hass.data[DOMAIN][config_entry.entry_id]
+                        ),
+                        use_services_cache=True,
+                        max_attempts=1,
+                    )
                 )
                 hass.data[DOMAIN][config_entry.entry_id]["connection"][
                     "connected"
@@ -49,9 +49,9 @@ async def setupConnection(hass, address, config_entry):
                 client = hass.data[DOMAIN][config_entry.entry_id]["connection"][
                     "client"
                 ]
-                hass.data[DOMAIN][config_entry.entry_id]["connection"][
-                    "service"
-                ] = client.services.get_service(SERVICE)
+                hass.data[DOMAIN][config_entry.entry_id]["connection"]["service"] = (
+                    client.services.get_service(SERVICE)
+                )
                 communicationService = hass.data[DOMAIN][config_entry.entry_id][
                     "connection"
                 ]["service"]
@@ -84,9 +84,15 @@ async def setupConnection(hass, address, config_entry):
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    await hass.config_entries.async_forward_entry_unload(entry, "switch")
-    await hass.config_entries.async_forward_entry_unload(entry, "light")
-    await hass.config_entries.async_forward_entry_unload(entry, "number")
+    await hass.config_entries.async_unload_platforms(
+        entry,
+        [
+            "switch",
+            "light",
+            "number",
+        ],
+    )
+
     if hass.data[DOMAIN][entry.entry_id]["connection"]["connected"]:
         client = hass.data[DOMAIN][entry.entry_id]["connection"]["client"]
         await client.disconnect()
@@ -145,14 +151,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
         hass.data[DOMAIN][entry.entry_id]["coordinator"] = lightsAppCoordinator
 
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, "light")
-        )
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, "switch")
-        )
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, "number")
+        await hass.async_create_task(
+            hass.config_entries.async_forward_entry_setups(
+                entry, ["light", "switch", "number"]
+            )
         )
         return True
     raise ConfigEntryNotReady()

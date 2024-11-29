@@ -108,7 +108,7 @@ def transformModeToHex(currentMode):
     for key, value in currentMode.items():
         binaryStr += "1" if value else "0"
     if binaryStr == "0000000":
-        binaryStr = "10000000"
+        binaryStr = "1000000"
     hex_byte = bytearray([int(binaryStr, 2)])
     return hex_byte
 

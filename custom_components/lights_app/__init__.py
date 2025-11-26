@@ -129,18 +129,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 LOGGER.debug("Not connected, reloading...")
                 await hass.config_entries.async_reload(entry.entry_id)
             else:
-                await sendCommand(
-                    hass.data[DOMAIN][entry.entry_id],
-                    hass.data[DOMAIN][entry.entry_id]["connection"]["client"],
-                    hass.data[DOMAIN][entry.entry_id]["connection"]["service"],
-                    getLightStateCommand(),
-                )
-                await sendCommand(
-                    hass.data[DOMAIN][entry.entry_id],
-                    hass.data[DOMAIN][entry.entry_id]["connection"]["client"],
-                    hass.data[DOMAIN][entry.entry_id]["connection"]["service"],
-                    getModeStateCommand(),
-                )
+                entry_data = hass.data[DOMAIN][entry.entry_id]
+
+                if entry_data["statePending"]:
+                    await sendCommand(
+                        entry_data,
+                        entry_data["connection"]["client"],
+                        entry_data["connection"]["service"],
+                        getLightStateCommand(),
+                    )
+
+                if entry_data["modePending"] or entry_data["brightnessPending"]:
+                    await sendCommand(
+                        entry_data,
+                        entry_data["connection"]["client"],
+                        entry_data["connection"]["service"],
+                        getModeStateCommand(),
+                    )
 
         lightsAppCoordinator = DataUpdateCoordinator(
             hass,

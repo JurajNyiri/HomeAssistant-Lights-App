@@ -88,11 +88,11 @@ def disconnect_handler(entryData: dict):
     def handleBleakDisconnect(client: BleakClientWithServiceCache) -> None:
         LOGGER.debug("handleBleakDisconnect")
         entryData["state"] = None
-        entryData["statePending"] = False
+        entryData["statePending"] = True
         entryData["mode"] = None
-        entryData["modePending"] = False
+        entryData["modePending"] = True
         entryData["brightness"] = None
-        entryData["brightnessPending"] = False
+        entryData["brightnessPending"] = True
         entryData["connection"]["connected"] = False
         for entity in entryData["entities"]:
             entity.async_write_ha_state()

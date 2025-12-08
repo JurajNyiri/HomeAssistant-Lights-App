@@ -3,7 +3,6 @@ from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.const import CONF_ADDRESS, STATE_UNAVAILABLE
 from homeassistant.components.light import LightEntity
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.components.light import ColorMode
 from .const import DOMAIN
 
 
@@ -21,8 +20,6 @@ class LightsAppEntity(Entity):
         self._name = "Lights App"
         self._name_suffix = name_suffix
 
-        self._attr_color_mode = ColorMode.ONOFF
-        self._attr_supported_color_modes = set([ColorMode.ONOFF])
         Entity.__init__(self)
 
     @property

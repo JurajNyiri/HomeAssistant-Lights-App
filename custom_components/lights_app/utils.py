@@ -88,11 +88,9 @@ def disconnect_handler(entryData: dict):
     def handleBleakDisconnect(client: BleakClientWithServiceCache) -> None:
         LOGGER.debug("handleBleakDisconnect")
         entryData["state"] = None
-        entryData["statePending"] = False
         entryData["mode"] = None
         entryData["modePending"] = False
         entryData["brightness"] = None
-        entryData["brightnessPending"] = False
         entryData["connection"]["connected"] = False
         for entity in entryData["entities"]:
             entity.async_write_ha_state()
@@ -136,7 +134,6 @@ def notification_handler(entryData: dict):
         if b"\x00\x00\x02" in data and len(data) == 5:
             state = data[3] == 0x01
             entryData["state"] = state
-            entryData["statePending"] = False
             await updateEntities(entryData["entities"])
 
         # process mode and brightness data
@@ -147,7 +144,6 @@ def notification_handler(entryData: dict):
                 "State of brightness changed to: " + str(entryData["brightness"])
             )
             entryData["modePending"] = False
-            entryData["brightnessPending"] = False
             await updateEntities(entryData["entities"])
 
     return bleak_notification_handler

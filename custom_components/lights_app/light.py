@@ -1,6 +1,5 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.components.light import ATTR_BRIGHTNESS, ColorMode
 
@@ -38,28 +37,8 @@ async def async_setup_entry(
 class LightsAppTurnOnOff(LightsAppLightEntity):
     def __init__(self, hass: HomeAssistant, config_entry, entryData):
         LightsAppLightEntity.__init__(self, hass, config_entry, entryData, "Light")
-        self._attr_supported_color_modes = set([ColorMode.BRIGHTNESS])
-        self._attr_color_mode = ColorMode.BRIGHTNESS
-        self._attr_brightness = None
-        self.setState()
-
-    def setState(self):
-        if "state" in self._entryData:
-            if self._entryData["state"] is None:
-                self._attr_state = STATE_UNAVAILABLE
-            else:
-                self._attr_state = "on" if self._entryData["state"] else "off"
-        if "brightness" in self._entryData:
-            if self._entryData["brightness"] is None:
-                self._attr_brightness = None
-            else:
-                self._attr_brightness = convert_device_brightness_to_ha(
-                    self._entryData["brightness"]
-                )
 
     async def async_update(self) -> None:
-        if not self._entryData["statePending"]:
-            self.setState()
         await self._entryData["coordinator"].async_request_refresh()
 
     async def async_turn_on(self, **kwargs) -> None:
@@ -82,5 +61,22 @@ class LightsAppTurnOnOff(LightsAppLightEntity):
         )
 
     @property
-    def state(self):
-        return self._attr_state
+    def available(self):
+        return (self._entryData.get("state", None) is not None
+            and self._entryData.get("brightness", None) is not None)
+
+    @property
+    def is_on(self):
+        return self._entryData["state"]
+
+    @property
+    def brightness(self):
+        return convert_device_brightness_to_ha(self._entryData["brightness"])
+
+    @property
+    def supported_color_modes(self):
+        return {ColorMode.BRIGHTNESS}
+
+    @property
+    def color_mode(self):
+        return ColorMode.BRIGHTNESS
